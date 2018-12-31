@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+
+  </head>
+
+</head>
+
+<body>
+  <button id="Signin" onclick="fbLogin()">Sign in with Facebook</button>
+  <div id="status"></div>
+  <button id="Signout" onclick="fbLogout()">Sign Out</button>
+  <div id="status"></div>
+
+</body>
+<script>
+
+
+
+  window.fbAsyncInit = function () {
+    FB.init({
+      appId: '232079177460581',
+      autoLogAppEvents: true,
+      xfbml: true,
+      version: 'v3.1'
+    });
+  };
+
+
+  (function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) { return; }
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+
+  fbLogin = () => {
+    FB.login(function (response) {
+
+      document.getElementById("status").innerHTML = response.status;
+      if (response.status === 'connected') {
+
+        axios.get("http://localhost:3030/accesstoken?token=" + response.authResponse.accessToken).then((result) => {
+
+          console.log(result);
+          var maxAge = "; max-age=604800";
+          document.cookie = "token=" + result.data + maxAge;
+          window.location.href = "http://localhost:3030/chatMessage.html";
+
+        })
+          .catch((error) => {
+            console.log("hai" + error);
+          });
+      }
+    })
+  }
+  fbLogout = () => {
+
+    document.cookie = 'token=; max-Age=0';
+    document.getElementById("status").innerHTML = "Successfully Logout";
+
+  }
+</script>
+
+</html>
